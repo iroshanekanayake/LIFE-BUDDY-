@@ -285,12 +285,18 @@ Object.assign(T.en,{goal:"Goals",hG:"Savings goals",gn:"Goal name (e.g. New phon
 Object.assign(T.si,{wpT:"පසුබිම (wallpaper)",wpa:"පසුබිම ලා/අඳුරු බව",wpn:"නැත",pinT:"PIN ලොක් එක",on:"සක්‍රීයයි",off:"අක්‍රීයයි",pin1:"PIN අංක 4ක්",pin2:"PIN නැවත ඇතුළත් කරන්න",pinSet:"PIN සකසන්න",pinChange:"PIN වෙනස් කරන්න",pinRm:"PIN ඉවත් කරන්න",pinFmt:"අංක හතරක් ඇතුළත් කරන්න",pinMis:"PIN දෙක ගැලපෙන්නේ නැහැ",pinOk:"PIN සකසා ඇත",pinOff:"PIN ඉවත් කළා",pinEnter:"PIN ඇතුළත් කරන්න",pinWrong:"වැරදි PIN",pinForget:"PIN අමතක වුණාද?",pinReset2:"සියලු දත්ත මැකේවි. තහවුරු කරන්න නැවත ටැප් කරන්න",pinNote:"මෙය ඔයාගේ ෆෝන් එකේ privacy සඳහායි. ඉතා ශක්තිමත් ආරක්ෂාවක් නොවේ. PIN අමතක වුණොත් දත්ත මැකිය යුතුයි; ඒ නිසා backup එකක් තබාගන්න."});
 Object.assign(T.en,{wpT:"Wallpaper",wpa:"Wallpaper brightness / dimming",wpn:"None",pinT:"PIN lock",on:"On",off:"Off",pin1:"4-digit PIN",pin2:"Re-enter PIN",pinSet:"Set PIN",pinChange:"Change PIN",pinRm:"Remove PIN",pinFmt:"Enter exactly 4 digits",pinMis:"The two PINs do not match",pinOk:"PIN is set",pinOff:"PIN removed",pinEnter:"Enter PIN",pinWrong:"Wrong PIN",pinForget:"Forgot PIN?",pinReset2:"This erases all data. Tap again to confirm",pinNote:"This is for privacy on your phone and is not strong security. If you forget the PIN, data must be erased, so keep a backup."});
 var D=[["e","කෑම","Food"],["e","ගමන්","Transport"],["e","බිල්පත්","Bills"],["e","රීලෝඩ්","Reload"],["e","වෙනත්","Other"],["i","දවසේ කුලී","Daily wage"],["i","පඩි","Salary"],["i","ව්‍යාපාර","Business"],["i","වෙනත්","Other"]];
-var S={lang:"si",entries:[],cats:D.map(function(d,i){return{id:"d"+i,t:d[0],si:d[1],en:d[2]}})};
-var K="dawas-gana-v1",mem=null;
-try{var r=localStorage.getItem(K);if(r){S=JSON.parse(r)}}catch(e){}
+var S={lang:"en",entries:[],cats:D.map(function(d,i){return{id:"d"+i,t:d[0],si:d[1],en:d[2]}})};
+var K="dawas-gana-v1",mem=null,preferredLoginLang=null;
+try{
+  preferredLoginLang=localStorage.getItem("life-buddy-login-language");
+  if(preferredLoginLang==="si"||preferredLoginLang==="en")S.lang=preferredLoginLang;
+  var r=localStorage.getItem(K);if(r){S=JSON.parse(r)}
+}catch(e){}
+if(S.lang!=="si"&&S.lang!=="en")S.lang=preferredLoginLang==="si"?"si":"en";
+try{localStorage.setItem("life-buddy-login-language",S.lang)}catch(e){}
 function fix(){S.debts=S.debts||[];S.bills=S.bills||[];S.loans=S.loans||[];S.goals=S.goals||[];if(!S.cats.some(function(c){return c.id==="dl"}))S.cats.push({id:"dl",t:"e",si:"ලෝන්",en:"Loan"})}
 fix();
-function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){mem=S}}
+function save(){try{localStorage.setItem(K,JSON.stringify(S));localStorage.setItem("life-buddy-login-language",S.lang)}catch(e){mem=S}}
 var $=function(i){return document.getElementById(i)};
 var P="today",ft="e",fc=null,eid=null,ct="e";
 function t(k){return T[S.lang][k]}
@@ -716,20 +722,20 @@ if ("serviceWorker" in navigator) {
 </script>
 
 
-<div id="cloudBoot" role="status" aria-live="polite">LIFE-BUDDY සූදානම් වෙමින්…</div>
+<div id="cloudBoot" role="status" aria-live="polite">LIFE-BUDDY is getting ready…</div>
 <div id="cloudGate" hidden>
  <div id="cloudCard">
   <h2>☁️ LIFE-BUDDY</h2>
-  <p id="cloudIntro">ඔබගේ ගිණුමට පිවිසෙන්න. ඔබගේ දත්ත ඔබගේ ගිණුම සමඟ Cloud එකේ සුරැකේ.</p>
-  <button id="cloudGoogle">Continue with Google</button>
-  <div style="text-align:center;color:var(--mut);font-size:12px;margin:4px">— හෝ Email භාවිතා කරන්න —</div>
-  <input id="cloudEmail" type="email" autocomplete="email" placeholder="Email address">
-  <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Password (අවම අක්ෂර 6)">
-  <button id="cloudEmailLogin">Email මඟින් Login වන්න</button>
-  <button class="secondary" id="cloudEmailSignup">අලුත් ගිණුමක් සාදන්න</button>
-  <button class="secondary" id="cloudOffline">මෙම උපාංගයේ Offline භාවිතා කරන්න</button>
+  <p id="cloudIntro"></p>
+  <button id="cloudGoogle"></button>
+  <div id="cloudDivider" style="text-align:center;color:var(--mut);font-size:12px;margin:4px"></div>
+  <input id="cloudEmail" type="email" autocomplete="email">
+  <input id="cloudPassword" type="password" autocomplete="current-password">
+  <button id="cloudEmailLogin"></button>
+  <button class="secondary" id="cloudEmailSignup"></button>
+  <button class="secondary" id="cloudOffline"></button>
   <div id="cloudStatus" role="status" aria-live="polite"></div>
-  <p style="font-size:11px;margin-bottom:0">Public registration සක්‍රියයි. ඔබගේ පුද්ගලික දත්ත වෙනත් ගිණුම්වලට නොපෙන්වයි.</p>
+  <p id="cloudPrivacy" style="font-size:11px;margin-bottom:0"></p>
  </div>
 </div>
 <script>
@@ -739,8 +745,22 @@ if ("serviceWorker" in navigator) {
   var gate=document.getElementById('cloudGate'),status=document.getElementById('cloudStatus');
   var boot=document.getElementById('cloudBoot'),userBar=document.getElementById('cloudUserBar'),syncText=document.getElementById('cloudSyncText');
   var auth=null,db=null,currentUser=null,ready=false,offline=false,timer=null,unsub=null,applyingRemote=false,authResolved=false;
+  var gateCopy={
+    en:{boot:'LIFE-BUDDY is getting ready…',intro:'Sign in to your account. Your data is securely saved in your personal cloud.',google:'Continue with Google',divider:'— or use Email —',email:'Email address',password:'Password (at least 6 characters)',login:'Login with Email',signup:'Create a new account',offline:'Continue offline on this device',privacy:'Public registration is enabled. Your personal data is private to your account.',workingGoogle:'Signing in with Google…',workingEmail:'Signing in…',workingSignup:'Creating account…',badCredentials:'Enter a valid email address and a password of at least 6 characters.',signout:'Are you sure you want to sign out of LIFE-BUDDY?'},
+    si:{boot:'LIFE-BUDDY සූදානම් වෙමින්…',intro:'ඔබගේ ගිණුමට පිවිසෙන්න. ඔබගේ දත්ත ඔබගේ ගිණුම සමඟ Cloud එකේ ආරක්ෂිතව සුරැකේ.',google:'Google සමඟ ඉදිරියට යන්න',divider:'— හෝ Email භාවිතා කරන්න —',email:'Email ලිපිනය',password:'Password (අවම අක්ෂර 6)',login:'Email මඟින් Login වන්න',signup:'අලුත් ගිණුමක් සාදන්න',offline:'මෙම උපාංගයේ Offline භාවිතා කරන්න',privacy:'Public registration සක්‍රියයි. ඔබගේ පුද්ගලික දත්ත ඔබගේ ගිණුමට පමණක් සීමා වේ.',workingGoogle:'Google හරහා Login වෙමින්…',workingEmail:'Login වෙමින්…',workingSignup:'අලුත් ගිණුම සාදමින්…',badCredentials:'නිවැරදි Email ලිපිනයක් සහ අවම අක්ෂර 6ක Password එකක් ඇතුළත් කරන්න.',signout:'ඔබට LIFE-BUDDY ගිණුමෙන් ඉවත් වීමට අවශ්‍යද?'}
+  };
+  function currentCopy(){return gateCopy[window.S&&window.S.lang==='si'?'si':'en']}
+  function renderGateLanguage(){
+    var c=currentCopy();
+    var put=function(id,value){var el=document.getElementById(id);if(el)el.textContent=value};
+    put('cloudBoot',c.boot);put('cloudIntro',c.intro);put('cloudGoogle',c.google);put('cloudDivider',c.divider);
+    put('cloudEmailLogin',c.login);put('cloudEmailSignup',c.signup);put('cloudOffline',c.offline);put('cloudPrivacy',c.privacy);
+    var email=document.getElementById('cloudEmail'),pass=document.getElementById('cloudPassword');
+    if(email)email.placeholder=c.email;if(pass)pass.placeholder=c.password;
+    if(document.documentElement)document.documentElement.lang=window.S&&window.S.lang==='si'?'si':'en';
+  }
   function say(msg){if(status)status.textContent=msg}
-  function showGate(show){if(gate)gate.hidden=!show}
+  function showGate(show){if(gate){if(show)renderGateLanguage();gate.hidden=!show}}
   function finishBoot(){authResolved=true;if(boot)boot.hidden=true}
   function syncLabel(msg){if(syncText)syncText.textContent=msg;var meta=document.getElementById('cloudAccountMeta');if(meta)meta.textContent=msg}
   function setSignedIn(user){currentUser=user;ready=false;userBar.style.display='flex';document.getElementById('cloudUserText').textContent=user.email||'Google account';showGate(false);syncLabel('Cloud sync: Connecting…')}
@@ -760,6 +780,7 @@ if ("serviceWorker" in navigator) {
           localStorage.setItem('life-buddy-pre-cloud-backup',localNow);
       }catch(backupError){console.warn('Local pre-cloud safety copy could not be stored',backupError)}
       applyingRemote=true;window.S=snap.data().data;
+      try{if(window.S.lang==='si'||window.S.lang==='en')localStorage.setItem('life-buddy-login-language',window.S.lang)}catch(langErr){}
       if(typeof window.fix==='function')window.fix();
       localSave();
       if(typeof window.applyWp==='function')window.applyWp();
@@ -779,6 +800,7 @@ if ("serviceWorker" in navigator) {
       var data=remote.data();
       if(data.updatedAt&&data.updatedAt.toMillis&&window.__lifeBuddyLastLocalSave&&data.updatedAt.toMillis()<window.__lifeBuddyLastLocalSave)return;
       applyingRemote=true;window.S=data.data;
+      try{if(window.S.lang==='si'||window.S.lang==='en')localStorage.setItem('life-buddy-login-language',window.S.lang)}catch(langErr){}
       if(typeof window.fix==='function')window.fix();localSave();
       if(typeof window.applyWp==='function')window.applyWp();if(typeof window.applyTheme==='function')window.applyTheme();if(typeof window.all==='function')window.all();
       applyingRemote=false;syncLabel('Cloud synced ✓');
@@ -787,26 +809,45 @@ if ("serviceWorker" in navigator) {
   function emailCredentials(){
     var email=document.getElementById('cloudEmail').value.trim();
     var pass=document.getElementById('cloudPassword').value;
-    if(!email||pass.length<6){say('නිවැරදි Email ලිපිනයක් සහ අවම අක්ෂර 6ක Password එකක් ඇතුළත් කරන්න.');return null}
+    if(!email||pass.length<6){say(currentCopy().badCredentials);return null}
     return {email:email,pass:pass};
   }
   async function emailLogin(){
     var c=emailCredentials();if(!c)return;
-    try{say('Login වෙමින්…');await auth.signInWithEmailAndPassword(c.email,c.pass)}
+    try{say(currentCopy().workingEmail);await auth.signInWithEmailAndPassword(c.email,c.pass)}
     catch(e){say(friendly(e))}
   }
   async function emailSignup(){
     var c=emailCredentials();if(!c)return;
-    try{say('අලුත් ගිණුම සාදමින්…');await auth.createUserWithEmailAndPassword(c.email,c.pass)}
+    try{say(currentCopy().workingSignup);await auth.createUserWithEmailAndPassword(c.email,c.pass)}
     catch(e){say(friendly(e))}
   }
-  function friendly(e){var c=e&&e.code;return ({'auth/email-already-in-use':'මෙම Email එක දැනටමත් භාවිතා වේ. Login කරන්න.','auth/weak-password':'වඩා ශක්තිමත් Password එකක් භාවිතා කරන්න.','auth/invalid-email':'Email ලිපිනය නිවැරදි නැහැ.','auth/too-many-requests':'උත්සාහයන් වැඩියි. පසුව නැවත උත්සාහ කරන්න.','auth/operation-not-allowed':'Firebase Console තුළ මෙම Login ක්‍රමය සක්‍රිය කරන්න.','auth/unauthorized-domain':'Firebase Authentication → Authorized domains තුළ GitHub Pages domain එක එක් කරන්න.','auth/popup-blocked':'Google Login popup එක Browser එකෙන් අවහිර කළා. Chrome තුළ නැවත උත්සාහ කරන්න.','auth/popup-closed-by-user':'Google Login කවුළුව වසා ඇත. නැවත උත්සාහ කරන්න.','auth/cancelled-popup-request':'Google Login ඉල්ලීමක් දැනටමත් ක්‍රියාත්මකයි. මොහොතක් ඉඳලා නැවත උත්සාහ කරන්න.','auth/operation-not-supported-in-this-environment':'මෙම පරිසරයේ Google Popup Login සහාය නොදක්වයි. සාමාන්‍ය Chrome Browser එකෙන් විවෘත කරන්න.','permission-denied':'Firestore Rules පරීක්ෂා කරන්න.'})[c]||((e&&e.message)||'සම්බන්ධ වීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.')}
+  function friendly(e){
+    var code=e&&e.code,si=window.S&&window.S.lang==='si';
+    var messages={
+      'auth/email-already-in-use':si?'මෙම Email එක දැනටමත් භාවිතා වේ. Login කරන්න.':'This email is already registered. Please log in.',
+      'auth/weak-password':si?'වඩා ශක්තිමත් Password එකක් භාවිතා කරන්න.':'Please use a stronger password.',
+      'auth/invalid-email':si?'Email ලිපිනය නිවැරදි නැහැ.':'Please enter a valid email address.',
+      'auth/invalid-credential':si?'Email හෝ Password නිවැරදි නැහැ.':'The email or password is incorrect.',
+      'auth/user-not-found':si?'මෙම Email එකට ගිණුමක් හමු වුණේ නැහැ.':'No account was found for this email.',
+      'auth/wrong-password':si?'Password එක නිවැරදි නැහැ.':'The password is incorrect.',
+      'auth/too-many-requests':si?'උත්සාහයන් වැඩියි. පසුව නැවත උත්සාහ කරන්න.':'Too many attempts. Please try again later.',
+      'auth/operation-not-allowed':si?'Firebase Console තුළ මෙම Login ක්‍රමය සක්‍රිය කරන්න.':'Enable this sign-in method in Firebase Console.',
+      'auth/unauthorized-domain':si?'Firebase Authentication → Authorized domains තුළ GitHub Pages domain එක එක් කරන්න.':'Add the GitHub Pages domain under Firebase Authentication → Authorized domains.',
+      'auth/popup-blocked':si?'Google Login popup එක Browser එකෙන් අවහිර කළා. Chrome තුළ නැවත උත්සාහ කරන්න.':'The browser blocked the Google sign-in popup. Try again in Chrome.',
+      'auth/popup-closed-by-user':si?'Google Login කවුළුව වසා ඇත. නැවත උත්සාහ කරන්න.':'The Google sign-in window was closed. Please try again.',
+      'auth/cancelled-popup-request':si?'Google Login ඉල්ලීමක් දැනටමත් ක්‍රියාත්මකයි. මොහොතක් ඉඳලා නැවත උත්සාහ කරන්න.':'A Google sign-in request is already running. Please wait and try again.',
+      'auth/operation-not-supported-in-this-environment':si?'මෙම පරිසරයේ Google Popup Login සහාය නොදක්වයි. සාමාන්‍ය Chrome Browser එකෙන් විවෘත කරන්න.':'Google popup sign-in is not supported here. Open the app in Chrome.',
+      'permission-denied':si?'Firestore Rules පරීක්ෂා කරන්න.':'Please check the Firestore security rules.'
+    };
+    return messages[code]||((e&&e.message)||(si?'සම්බන්ධ වීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.':'Sign-in failed. Please try again.'));
+  }
   document.getElementById('cloudEmailLogin').onclick=emailLogin;
   document.getElementById('cloudEmailSignup').onclick=emailSignup;
   document.getElementById('cloudGoogle').onclick=async function(){
     var button=this;
     button.disabled=true;
-    say('Google හරහා Login වෙමින්…');
+    say(currentCopy().workingGoogle);
     try{
       var provider=new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({prompt:'select_account'});
@@ -823,14 +864,15 @@ if ("serviceWorker" in navigator) {
   };
   document.getElementById('cloudOffline').onclick=setOffline;
   document.getElementById('cloudSignOut').onclick=async function(){
-    if(!window.confirm('ඔබට LIFE-BUDDY ගිණුමෙන් Sign out වීමට අවශ්‍යද?'))return;
+    if(!window.confirm(currentCopy().signout))return;
     try{
       if(unsub){unsub();unsub=null}clearTimeout(timer);
       if(offline){offline=false;currentUser=null;ready=false;userBar.style.display='none';showGate(true);return}
       await auth.signOut();
     }catch(e){syncLabel(friendly(e))}
   };
-  if(!configured||!window.firebase){say('Firebase setup තවම සම්පූර්ණ නැහැ. firebase-config.js ගොනුවේ Firebase Web App config ඇතුළත් කරන්න.');document.getElementById('cloudGoogle').disabled=true;document.getElementById('cloudEmailLogin').disabled=true;document.getElementById('cloudEmailSignup').disabled=true;showGate(true);finishBoot();hookSave();return}
+  renderGateLanguage();
+  if(!configured||!window.firebase){say(window.S&&window.S.lang==='si'?'Firebase setup තවම සම්පූර්ණ නැහැ. firebase-config.js ගොනුවේ Firebase Web App config ඇතුළත් කරන්න.':'Firebase setup is incomplete. Add the Firebase Web App config to firebase-config.js.');document.getElementById('cloudGoogle').disabled=true;document.getElementById('cloudEmailLogin').disabled=true;document.getElementById('cloudEmailSignup').disabled=true;showGate(true);finishBoot();hookSave();return}
   try{
     firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.firestore();
     // Explicitly retain the Firebase session across PWA/browser restarts.

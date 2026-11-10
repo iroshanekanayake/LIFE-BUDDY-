@@ -1,4 +1,4 @@
-const CACHE_NAME = "life-buddy-shell-v7-v6-ui";
+const CACHE_NAME = "life-buddy-shell-v8-language-sync";
 const APP_SHELL = [
   "./",
   "./index.html",
