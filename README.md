@@ -1,6 +1,6 @@
 # LIFE-BUDDY — Firebase Cloud Version
 
-This package is based on the supplied LIFE-BUDDY app. Existing finance-tracker screens and features are retained. It adds Firebase Email/Password and Google sign-in, Firestore cloud sync, local browser caching, first-device local-data migration, and standard browser downloads for PDF/CSV/JSON backup.
+This package is based on the supplied LIFE-BUDDY app. Existing finance-tracker screens and features are retained. It adds Firebase Email/Password and Google popup sign-in, Firestore cloud sync, local browser caching, first-device local-data migration, and standard browser downloads for PDF/CSV/JSON backup.
 
 ## Firebase project already configured
 
@@ -15,9 +15,10 @@ The Firebase Web API key in that file is a public client configuration value. Do
 ## Required Firebase Console setup
 
 1. Authentication → Sign-in method: enable **Email/Password** and **Google**.
-2. Authentication → Settings → Authorized domains: confirm `iroshanekanayake.github.io` is listed (it was already visible in the supplied screenshot).
-3. Cloud Firestore: create the database if it has not already been created.
-4. Firestore → Rules: publish the exact contents of `firestore.rules` in this package. Until these rules are deployed, signed-in users may see `permission-denied` and cloud sync will not work.
+2. Google sign-in uses `signInWithPopup()` because this app is hosted on GitHub Pages rather than Firebase Hosting. This avoids the cross-site storage issue that can prevent `signInWithRedirect()` from completing in modern browsers.
+3. Authentication → Settings → Authorized domains: confirm `iroshanekanayake.github.io` is listed.
+4. Cloud Firestore: create the database if it has not already been created.
+5. Firestore → Rules: publish the exact contents of `firestore.rules` in this package. Until these rules are deployed, signed-in users may see `permission-denied` and cloud sync will not work.
 
 The rules allow an authenticated user to read/write only their own `/users/{uid}/private/state` document. All other paths are denied.
 
@@ -39,7 +40,7 @@ Open the HTTPS GitHub Pages URL and refresh once. The service-worker cache versi
 - The app syncs the complete LIFE-BUDDY state as one Firestore document. Firestore documents have a 1 MiB limit; very large data sets may need a later collection-based migration.
 - This version uses last-write-wins whole-state synchronization. Avoid editing the same account simultaneously on multiple devices until a future conflict-aware sync upgrade is added.
 - Offline changes remain on that device until connectivity and sign-in return; this build does not merge conflicting offline edits from multiple devices.
-- PDF/CSV/JSON exports use standard browser Blob downloads, not an embedded-app download bridge. Android Chrome saves to Downloads. On iPhone Safari, a PDF may open in preview; use Share → Save to Files. After deployment, refresh the app once so the v5 service-worker cache replaces older cached code.
+- PDF/CSV/JSON exports use standard browser Blob downloads, not an embedded-app download bridge. Android Chrome saves to Downloads. On iPhone Safari, a PDF may open in preview; use Share → Save to Files. After deployment, refresh the app once so the v6 service-worker cache replaces older cached code.
 - Scheduled Firestore backups require a paid Blaze plan; the app does not depend on scheduled backups. Use the app's JSON backup export regularly.
 
 ## Files

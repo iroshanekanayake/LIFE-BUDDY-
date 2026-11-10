@@ -788,10 +788,27 @@ if ("serviceWorker" in navigator) {
     try{say('අලුත් ගිණුම සාදමින්…');await auth.createUserWithEmailAndPassword(c.email,c.pass)}
     catch(e){say(friendly(e))}
   }
-  function friendly(e){var c=e&&e.code;return ({'auth/email-already-in-use':'මෙම Email එක දැනටමත් භාවිතා වේ. Login කරන්න.','auth/weak-password':'වඩා ශක්තිමත් Password එකක් භාවිතා කරන්න.','auth/invalid-email':'Email ලිපිනය නිවැරදි නැහැ.','auth/too-many-requests':'උත්සාහයන් වැඩියි. පසුව නැවත උත්සාහ කරන්න.','auth/operation-not-allowed':'Firebase Console තුළ මෙම Login ක්‍රමය සක්‍රිය කරන්න.','auth/unauthorized-domain':'Firebase Authentication → Authorized domains තුළ GitHub Pages domain එක එක් කරන්න.','permission-denied':'Firestore Rules පරීක්ෂා කරන්න.'})[c]||((e&&e.message)||'සම්බන්ධ වීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.')}
+  function friendly(e){var c=e&&e.code;return ({'auth/email-already-in-use':'මෙම Email එක දැනටමත් භාවිතා වේ. Login කරන්න.','auth/weak-password':'වඩා ශක්තිමත් Password එකක් භාවිතා කරන්න.','auth/invalid-email':'Email ලිපිනය නිවැරදි නැහැ.','auth/too-many-requests':'උත්සාහයන් වැඩියි. පසුව නැවත උත්සාහ කරන්න.','auth/operation-not-allowed':'Firebase Console තුළ මෙම Login ක්‍රමය සක්‍රිය කරන්න.','auth/unauthorized-domain':'Firebase Authentication → Authorized domains තුළ GitHub Pages domain එක එක් කරන්න.','auth/popup-blocked':'Google Login popup එක Browser එකෙන් අවහිර කළා. Chrome තුළ නැවත උත්සාහ කරන්න.','auth/popup-closed-by-user':'Google Login කවුළුව වසා ඇත. නැවත උත්සාහ කරන්න.','auth/cancelled-popup-request':'Google Login ඉල්ලීමක් දැනටමත් ක්‍රියාත්මකයි. මොහොතක් ඉඳලා නැවත උත්සාහ කරන්න.','auth/operation-not-supported-in-this-environment':'මෙම පරිසරයේ Google Popup Login සහාය නොදක්වයි. සාමාන්‍ය Chrome Browser එකෙන් විවෘත කරන්න.','permission-denied':'Firestore Rules පරීක්ෂා කරන්න.'})[c]||((e&&e.message)||'සම්බන්ධ වීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.')}
   document.getElementById('cloudEmailLogin').onclick=emailLogin;
   document.getElementById('cloudEmailSignup').onclick=emailSignup;
-  document.getElementById('cloudGoogle').onclick=async function(){try{var provider=new firebase.auth.GoogleAuthProvider();await auth.signInWithRedirect(provider)}catch(e){say(friendly(e))}};
+  document.getElementById('cloudGoogle').onclick=async function(){
+    var button=this;
+    button.disabled=true;
+    say('Google හරහා Login වෙමින්…');
+    try{
+      var provider=new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({prompt:'select_account'});
+      // GitHub Pages is a third-party hosting domain. Firebase redirect sign-in can
+      // fail in modern browsers when cross-site storage is restricted. Use popup
+      // sign-in, which Firebase documents as an alternative for this hosting setup.
+      await auth.signInWithPopup(provider);
+    }catch(e){
+      console.error('LIFE-BUDDY Google sign-in failed:',e);
+      say(friendly(e));
+    }finally{
+      button.disabled=false;
+    }
+  };
   document.getElementById('cloudOffline').onclick=setOffline;
   document.getElementById('cloudSignOut').onclick=async function(){if(offline){offline=false;userBar.style.display='none';showGate(true);return}try{if(unsub)unsub();await auth.signOut();showGate(true);userBar.style.display='none'}catch(e){syncLabel(friendly(e))}};
   if(!configured||!window.firebase){say('Firebase setup තවම සම්පූර්ණ නැහැ. firebase-config.js ගොනුවේ Firebase Web App config ඇතුළත් කරන්න.');document.getElementById('cloudGoogle').disabled=true;document.getElementById('cloudEmailLogin').disabled=true;document.getElementById('cloudEmailSignup').disabled=true;showGate(true);hookSave();return}
