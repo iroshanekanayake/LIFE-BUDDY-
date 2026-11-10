@@ -1,12 +1,11 @@
-const CACHE_NAME = "life-buddy-shell-v1";
+const CACHE_NAME = "life-buddy-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
+  "./firebase-config.js",
   "./icon-192.png",
   "./icon-512.png",
-  "./life-buddy-logo-1.png",
-  "./life-buddy-logo-2.png"
 ];
 
 self.addEventListener("install", (event) => {

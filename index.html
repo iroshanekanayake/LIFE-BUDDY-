@@ -74,6 +74,18 @@ html.wp body{background:transparent}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
 section>*+*{margin-top:12px}
 .lnk{background:none;border:0;color:var(--mut);text-decoration:underline;width:100%;margin-top:12px}
+
+/* LIFE-BUDDY Cloud account gate */
+#cloudGate{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+#cloudGate[hidden]{display:none}
+#cloudCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 40px #0002}
+#cloudCard h2{margin:0 0 6px;font-size:23px}#cloudCard p{margin:5px 0 14px;color:var(--mut);font-size:14px}
+#cloudCard input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);margin:6px 0}
+#cloudCard button{width:100%;padding:12px;border:0;border-radius:12px;background:var(--pri);color:var(--onpri);margin:6px 0;font-weight:600}
+#cloudCard button.secondary{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+#cloudStatus{font-size:13px;color:var(--mut);min-height:22px;white-space:pre-wrap}
+#cloudUserBar{display:none;position:sticky;top:0;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 10px;margin-bottom:10px;font-size:12px;align-items:center;gap:8px}
+#cloudUserBar button{padding:5px 9px;font-size:12px;width:auto;margin:0}
 </style>
 
 <link rel="manifest" href="./manifest.json">
@@ -243,6 +255,10 @@ section>*+*{margin-top:12px}
 </section>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
 <script>
 var T={si:{ttl:"LIFE-BUDDY",lng:"English",today:"අද",week:"සතිය",month:"මාසය",bal:"ඉතිරිය",inc:"ආදායම",exp:"වියදම",add:"අලුත් සටහනක්",empty:"තවම සටහන් නැහැ. පළමු සටහන එක් කරන්න.",amt:"මුදල (රු.)",cat:"කාණ්ඩය",note:"සටහනක් (අවශ්‍ය නම්)",date:"දිනය",save:"සුරකින්න",del:"මකන්න",back:"ආපසු",mc:"කාණ්ඩ කළමනාකරණය",nc:"අලුත් කාණ්ඩයේ නම",ac:"කාණ්ඩය එක් කරන්න",err:"මුදල ඇතුළත් කරන්න",cerr:"නමක් ඇතුළත් කරන්න",rs:"රු. "},
 en:{ttl:"LIFE-BUDDY",lng:"සිංහල",today:"Today",week:"Week",month:"Month",bal:"Balance",inc:"Income",exp:"Expense",add:"New entry",empty:"No entries yet. Add your first one.",amt:"Amount (Rs.)",cat:"Category",note:"Note (optional)",date:"Date",save:"Save",del:"Delete",back:"Back",mc:"Manage categories",nc:"New category name",ac:"Add category",err:"Enter an amount",cerr:"Enter a name",rs:"Rs. "}};
@@ -252,8 +268,8 @@ Object.assign(T.si,{home:"මුල්",set:"සැකසුම්",hS:"සැ�
 Object.assign(T.en,{home:"Home",set:"Settings",hS:"Settings and profile",pnT:"Your name",acol:"Profile colour",bud:"Monthly spending limit (Rs.)",mb:"Spent this month",thT:"Theme",thA:"Auto",thLt:"Light",thDk:"Dark",lgT:"Language",rst:"Delete all entries",rst2:"Sure? Tap again",hello:"Hello"});
 Object.assign(T.si,{sk0:"වනය",sk1:"සාගරය",sk2:"හිරු බැස්ම",sk3:"රාජකීය",sk4:"රාත්‍රිය",pb:"ඡායාරූපයක් තෝරන්න",pr:"ඉවත් කරන්න"});
 Object.assign(T.en,{sk0:"Forest",sk1:"Ocean",sk2:"Sunset",sk3:"Royal",sk4:"Night",pb:"Choose photo",pr:"Remove"});
-Object.assign(T.si,{pick:"මාසයක්",trend:"මාස 6ක ආදායම සහ වියදම",xp:"PDF බාගන්න",xc:"CSV (Excel)",bk:"Backup එකක් සුරකින්න",rt:"Backup එකකින් ආපහු ගන්න",tapEdit:"වෙනස් කිරීමට නම මත ටැප් කරන්න",nodl:"මෙතනින් බාගත කිරීම ලබාගත නොහැක.",saved:"සුරැකුණා.",wait:"සකස් වෙමින්...",bad:"මෙය වලංගු backup ගොනුවක් නොවේ.",restored:"ආපහු ගත්තා."});
-Object.assign(T.en,{pick:"History",trend:"Income and expense, last 6 months",xp:"Download PDF",xc:"CSV (Excel)",bk:"Save a backup",rt:"Restore from backup",tapEdit:"Tap a name to edit it",nodl:"Downloads are not available here.",saved:"Saved.",wait:"Preparing...",bad:"That is not a valid backup file.",restored:"Restored."});
+Object.assign(T.si,{pick:"මාසයක්",trend:"මාස 6ක ආදායම සහ වියදම",xp:"PDF බාගන්න",xc:"CSV (Excel)",bk:"Backup එකක් සුරකින්න",rt:"Backup එකකින් ආපහු ගන්න",tapEdit:"වෙනස් කිරීමට නම මත ටැප් කරන්න",nodl:"බාගත කිරීම ආරම්භ කළ නොහැක. Chrome/Safari බ්‍රවුසරයෙන් නැවත උත්සාහ කරන්න.",saved:"බාගත කිරීම ආරම්භ කළා. Downloads පරීක්ෂා කරන්න. iPhone එකේ PDF විවෘත වුණොත් Share → Save to Files තෝරන්න.",wait:"සකස් වෙමින්...",bad:"මෙය වලංගු backup ගොනුවක් නොවේ.",restored:"ආපහු ගත්තා."});
+Object.assign(T.en,{pick:"History",trend:"Income and expense, last 6 months",xp:"Download PDF",xc:"CSV (Excel)",bk:"Save a backup",rt:"Restore from backup",tapEdit:"Tap a name to edit it",nodl:"Could not start the download. Please try again in Chrome or Safari.",saved:"Download started. Check Downloads. On iPhone, if the PDF opens in preview, use Share → Save to Files.",wait:"Preparing...",bad:"That is not a valid backup file.",restored:"Restored."});
 Object.assign(T.si,{goal:"ඉලක්ක",hG:"ඉතිරි කිරීමේ ඉලක්ක",gn:"ඉලක්කයේ නම (උදා: අලුත් ෆෝන් එක)",gt:"ඉලක්ක මුදල (රු.)",gs:"දැනට ඉතිරි කර ඇති මුදල",gplus:"එකතු කරන්න",gdone:"ළඟා වුණා!",gempty:"තවම ඉලක්ක නැහැ. පළවැනි ඉලක්කය එක් කරන්න.",gerr:"නමත් ඉලක්ක මුදලත් ඇතුළත් කරන්න",loan:"ලෝන්",ln:"ලෝනයේ නම (උදා: බැන්කු ලෝන්)",lb:"ඉතිරි මුළු ගෙවිය යුතු මුදල (රු.)",lp:"මාසික වාරිකය (රු.)",lleft:"ඉතිරි ලෝන් මුදල",lmon:"මාසික වාරික",lmonth:"වාරිකය",lfin:"ගෙවා අවසන්",lmo:"මාස ඉතිරියි",lempty:"ලෝන් සටහන් නැහැ.",lerr:"නම, ඉතිරි මුදල, වාරිකය, දිනය ඇතුළත් කරන්න",hnL:"වෙනස් කිරීමට නම මත ටැප් කරන්න. \"ගෙවූවා\" ටැප් කළාම වාරිකය ඉතිරියෙන් අඩු වී වියදමක් ලෙස සටහන් වේ.",search:"සොයන්න (කාණ්ඩය, සටහන, දිනය)",all:"සියල්ල"});
 Object.assign(T.en,{goal:"Goals",hG:"Savings goals",gn:"Goal name (e.g. New phone)",gt:"Target amount (Rs.)",gs:"Saved so far",gplus:"Add",gdone:"Reached!",gempty:"No goals yet. Add your first one.",gerr:"Enter a name and a target amount",loan:"Loans",ln:"Loan name (e.g. Bank loan)",lb:"Remaining balance (Rs.)",lp:"Monthly instalment (Rs.)",lleft:"Loan balance left",lmon:"Monthly instalments",lmonth:"Instalment",lfin:"Fully paid",lmo:"months left",lempty:"No loans recorded.",lerr:"Enter a name, balance, instalment, and day",hnL:"Tap a name to edit. Tapping Mark paid lowers the balance by one instalment and records an expense.",search:"Search (category, note, date)",all:"All"});
 Object.assign(T.si,{wpT:"පසුබිම (wallpaper)",wpa:"පසුබිම ලා/අඳුරු බව",wpn:"නැත",pinT:"PIN ලොක් එක",on:"සක්‍රීයයි",off:"අක්‍රීයයි",pin1:"PIN අංක 4ක්",pin2:"PIN නැවත ඇතුළත් කරන්න",pinSet:"PIN සකසන්න",pinChange:"PIN වෙනස් කරන්න",pinRm:"PIN ඉවත් කරන්න",pinFmt:"අංක හතරක් ඇතුළත් කරන්න",pinMis:"PIN දෙක ගැලපෙන්නේ නැහැ",pinOk:"PIN සකසා ඇත",pinOff:"PIN ඉවත් කළා",pinEnter:"PIN ඇතුළත් කරන්න",pinWrong:"වැරදි PIN",pinForget:"PIN අමතක වුණාද?",pinReset2:"සියලු දත්ත මැකේවි. තහවුරු කරන්න නැවත ටැප් කරන්න",pinNote:"මෙය ඔයාගේ ෆෝන් එකේ privacy සඳහායි. ඉතා ශක්තිමත් ආරක්ෂාවක් නොවේ. PIN අමතක වුණොත් දත්ත මැකිය යුතුයි; ඒ නිසා backup එකක් තබාගන්න."});
@@ -480,10 +496,29 @@ $("sq").placeholder=t("search");renderWp();
 $("sft").innerHTML=[["","all"],["i","inc"],["e","exp"]].map(function(k){return'<button data-f="'+k[0]+'" class="'+(FT===k[0]?"on":"")+'">'+t(k[1])+"</button>"}).join("");
 }
 async function saveFile(name,data,mid){
-var m=$(mid);
-try{var dl=window.claude&&await claude.use("downloads");if(!dl){m.textContent=t("nodl");return}
-await dl.save({filename:name,data:data});m.textContent=t("saved")}
-catch(e){m.textContent=e&&e.code==="declined"?"":t("nodl")}
+var m=$(mid),url="",a=null;
+try{
+var blob=data instanceof Blob?data:new Blob([data],{type:name.toLowerCase().endsWith(".csv")?"text/csv;charset=utf-8":name.toLowerCase().endsWith(".json")?"application/json":"application/octet-stream"});
+if(window.navigator&&typeof navigator.msSaveOrOpenBlob==="function"){
+  navigator.msSaveOrOpenBlob(blob,name);
+  m.textContent=t("saved");return true;
+}
+if(!window.URL||typeof URL.createObjectURL!=="function")throw new Error("Blob downloads are not supported by this browser");
+url=URL.createObjectURL(blob);a=document.createElement("a");
+a.href=url;a.download=name;a.rel="noopener";a.style.position="fixed";a.style.left="-10000px";
+document.body.appendChild(a);
+// Trigger a normal browser download. On iOS Safari, the file may open in a
+// preview instead; users can then use Share > Save to Files.
+a.click();
+a.remove();
+setTimeout(function(){try{URL.revokeObjectURL(url)}catch(e){}},60000);
+m.textContent=t("saved");return true;
+}catch(e){
+ console.error("Download failed",e);
+ if(a&&a.parentNode)a.parentNode.removeChild(a);
+ if(url)try{URL.revokeObjectURL(url)}catch(ignore){}
+ m.textContent=t("nodl");return false;
+}
 }
 function fileTag(){return P==="pick"?PM:P==="month"?ym():P}
 function plabel(){return P==="pick"?mpLabel():P==="month"?ym():t(P)}
@@ -669,5 +704,108 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+
+<div id="cloudGate">
+ <div id="cloudCard">
+  <h2>☁️ LIFE-BUDDY</h2>
+  <p id="cloudIntro">ඔබගේ ගිණුමට පිවිසෙන්න. ඔබගේ දත්ත ඔබගේ ගිණුම සමඟ Cloud එකේ සුරැකේ.</p>
+  <button id="cloudGoogle">Continue with Google</button>
+  <div style="text-align:center;color:var(--mut);font-size:13px;margin:4px">— හෝ Email භාවිතා කරන්න —</div>
+  <input id="cloudEmail" type="email" autocomplete="email" placeholder="Email address">
+  <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Password (අවම අක්ෂර 6)">
+  <button id="cloudEmailLogin">Email මඟින් Login වන්න</button>
+  <button class="secondary" id="cloudEmailSignup">අලුත් ගිණුමක් සාදන්න</button>
+  <button class="secondary" id="cloudOffline">මෙම උපාංගයේ Offline භාවිතා කරන්න</button>
+  <div id="cloudStatus" role="status" aria-live="polite"></div>
+  <p style="font-size:11px;margin-bottom:0">Public registration සක්‍රියයි. ඔබගේ පුද්ගලික දත්ත වෙනත් ගිණුම්වලට නොපෙන්වයි.</p>
+ </div>
+</div>
+<div id="cloudUserBar"><span id="cloudUserText">Cloud account</span><span style="flex:1"></span><span id="cloudSyncText">Cloud ready</span><button id="cloudSignOut" class="secondary">Sign out</button></div>
+<script>
+(function(){
+  var cfg=window.LIFE_BUDDY_FIREBASE_CONFIG||{};
+  var configured=!!(cfg.apiKey&&cfg.apiKey!=="YOUR_API_KEY"&&cfg.projectId&&cfg.projectId!=="YOUR_PROJECT_ID");
+  var gate=document.getElementById('cloudGate'),status=document.getElementById('cloudStatus');
+  var userBar=document.getElementById('cloudUserBar'),syncText=document.getElementById('cloudSyncText');
+  var auth=null,db=null,currentUser=null,ready=false,offline=false,timer=null,unsub=null,applyingRemote=false;
+  function say(msg){if(status)status.textContent=msg}
+  function showGate(show){if(gate)gate.hidden=!show}
+  function syncLabel(msg){if(syncText)syncText.textContent=msg}
+  function setSignedIn(user){currentUser=user;ready=false;userBar.style.display='flex';document.getElementById('cloudUserText').textContent=user.email||'Google account';showGate(false);syncLabel('Syncing…')}
+  function setOffline(){offline=true;currentUser=null;ready=false;showGate(false);userBar.style.display='flex';document.getElementById('cloudUserText').textContent='Offline mode';syncLabel('This device only');}
+  function localSave(){try{localStorage.setItem('dawas-gana-v1',JSON.stringify(window.S))}catch(e){console.warn(e)}}
+  async function uploadState(){if(!currentUser||!ready||offline||applyingRemote)return;try{syncLabel('Saving…');await db.collection('users').doc(currentUser.uid).collection('private').doc('state').set({data:window.S,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),schemaVersion:1});syncLabel('Cloud saved ✓')}catch(e){console.error(e);syncLabel('Sync error — check internet');}}
+  function scheduleSave(){if(!currentUser||!ready||offline||applyingRemote)return;clearTimeout(timer);syncLabel('Changes pending…');timer=setTimeout(uploadState,900)}
+  function hookSave(){if(typeof window.save!=='function')return;var oldSave=window.save;window.save=function(){oldSave.apply(this,arguments);localSave();scheduleSave()}}
+  async function loadCloud(user){
+    var ref=db.collection('users').doc(user.uid).collection('private').doc('state');
+    var snap=await ref.get();
+    if(snap.exists&&snap.data()&&snap.data().data){
+      // Keep a one-time local safety copy before the first cloud pull on this browser.
+      try{
+        var localNow=localStorage.getItem('dawas-gana-v1');
+        if(localNow && !localStorage.getItem('life-buddy-pre-cloud-backup'))
+          localStorage.setItem('life-buddy-pre-cloud-backup',localNow);
+      }catch(backupError){console.warn('Local pre-cloud safety copy could not be stored',backupError)}
+      applyingRemote=true;window.S=snap.data().data;
+      if(typeof window.fix==='function')window.fix();
+      localSave();
+      if(typeof window.applyWp==='function')window.applyWp();
+      if(typeof window.applyTheme==='function')window.applyTheme();
+      if(typeof window.all==='function')window.all();
+      applyingRemote=false;
+      syncLabel('Cloud synced ✓');
+    }else{
+      // First login: migrate the existing device's local data into this account.
+      await ref.set({data:window.S,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),schemaVersion:1});
+      syncLabel('Local data uploaded ✓');
+    }
+    ready=true;
+    if(unsub)unsub();
+    unsub=ref.onSnapshot(function(remote){
+      if(!remote.exists||!remote.data()||!remote.data().data)return;
+      var data=remote.data();
+      if(data.updatedAt&&data.updatedAt.toMillis&&window.__lifeBuddyLastLocalSave&&data.updatedAt.toMillis()<window.__lifeBuddyLastLocalSave)return;
+      applyingRemote=true;window.S=data.data;
+      if(typeof window.fix==='function')window.fix();localSave();
+      if(typeof window.applyWp==='function')window.applyWp();if(typeof window.applyTheme==='function')window.applyTheme();if(typeof window.all==='function')window.all();
+      applyingRemote=false;syncLabel('Cloud synced ✓');
+    },function(e){console.warn('Cloud listener',e);syncLabel('Sync paused')});
+  }
+  function emailCredentials(){
+    var email=document.getElementById('cloudEmail').value.trim();
+    var pass=document.getElementById('cloudPassword').value;
+    if(!email||pass.length<6){say('නිවැරදි Email ලිපිනයක් සහ අවම අක්ෂර 6ක Password එකක් ඇතුළත් කරන්න.');return null}
+    return {email:email,pass:pass};
+  }
+  async function emailLogin(){
+    var c=emailCredentials();if(!c)return;
+    try{say('Login වෙමින්…');await auth.signInWithEmailAndPassword(c.email,c.pass)}
+    catch(e){say(friendly(e))}
+  }
+  async function emailSignup(){
+    var c=emailCredentials();if(!c)return;
+    try{say('අලුත් ගිණුම සාදමින්…');await auth.createUserWithEmailAndPassword(c.email,c.pass)}
+    catch(e){say(friendly(e))}
+  }
+  function friendly(e){var c=e&&e.code;return ({'auth/email-already-in-use':'මෙම Email එක දැනටමත් භාවිතා වේ. Login කරන්න.','auth/weak-password':'වඩා ශක්තිමත් Password එකක් භාවිතා කරන්න.','auth/invalid-email':'Email ලිපිනය නිවැරදි නැහැ.','auth/too-many-requests':'උත්සාහයන් වැඩියි. පසුව නැවත උත්සාහ කරන්න.','auth/operation-not-allowed':'Firebase Console තුළ මෙම Login ක්‍රමය සක්‍රිය කරන්න.','auth/unauthorized-domain':'Firebase Authentication → Authorized domains තුළ GitHub Pages domain එක එක් කරන්න.','permission-denied':'Firestore Rules පරීක්ෂා කරන්න.'})[c]||((e&&e.message)||'සම්බන්ධ වීම අසාර්ථකයි. නැවත උත්සාහ කරන්න.')}
+  document.getElementById('cloudEmailLogin').onclick=emailLogin;
+  document.getElementById('cloudEmailSignup').onclick=emailSignup;
+  document.getElementById('cloudGoogle').onclick=async function(){try{var provider=new firebase.auth.GoogleAuthProvider();await auth.signInWithRedirect(provider)}catch(e){say(friendly(e))}};
+  document.getElementById('cloudOffline').onclick=setOffline;
+  document.getElementById('cloudSignOut').onclick=async function(){if(offline){offline=false;userBar.style.display='none';showGate(true);return}try{if(unsub)unsub();await auth.signOut();showGate(true);userBar.style.display='none'}catch(e){syncLabel(friendly(e))}};
+  if(!configured||!window.firebase){say('Firebase setup තවම සම්පූර්ණ නැහැ. firebase-config.js ගොනුවේ Firebase Web App config ඇතුළත් කරන්න.');document.getElementById('cloudGoogle').disabled=true;document.getElementById('cloudEmailLogin').disabled=true;document.getElementById('cloudEmailSignup').disabled=true;showGate(true);hookSave();return}
+  try{
+    firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.firestore();
+    auth.getRedirectResult().catch(function(e){say(friendly(e))});
+    auth.onAuthStateChanged(async function(user){
+      if(!user){if(!offline){showGate(true);userBar.style.display='none'}return}
+      offline=false;setSignedIn(user);
+      try{await loadCloud(user)}catch(e){console.error(e);applyingRemote=false;ready=false;syncLabel('Cloud sync error');say(friendly(e));showGate(true)}
+    });
+    hookSave();
+  }catch(e){console.error(e);say('Firebase config එක නිවැරදි නැහැ: '+friendly(e));showGate(true)}
+})();
+</script>
 </body>
 </html>
