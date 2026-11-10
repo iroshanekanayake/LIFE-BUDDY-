@@ -1,9 +1,10 @@
-const CACHE_NAME = "life-buddy-shell-v8-language-sync";
+const CACHE_NAME = "life-buddy-shell-v10-local-bill-photos";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./firebase-config.js",
+  "./smart-bill-scanner.js",
   "./icon-192.png",
   "./icon-512.png",
 ];

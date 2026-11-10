@@ -62,3 +62,19 @@ Open the HTTPS GitHub Pages URL and refresh once. The service-worker cache versi
 - Service-worker cache version is bumped so installed PWAs can receive the updated app shell.
 
 After uploading the updated files, refresh the installed PWA once while online. Existing Firebase users and Firestore data are retained.
+
+## Smart Bill Scanner — local photo privacy version
+
+- Receipt images are saved only in this device/browser using IndexedDB. They are never uploaded to Firebase Storage.
+- Only the transaction fields (income/expense, amount, date, category, shop/description and a short OCR text summary) sync through the existing Firestore account state.
+- The original photo can be viewed from the transaction on the same device. It is not available on another phone or browser.
+- Local bill photos are automatically cleaned up after 180 days when the app next opens. Income/Expense records remain in the account.
+- Deleting a transaction also removes its local bill photo.
+- If the user clears browser/app storage, uninstalls the PWA, or changes device, local bill photos may be lost. Export/backup of Firestore data does not include these local photos. Keep the original receipt in the phone gallery if it must be retained longer.
+- No Firebase Storage bucket, Storage Rules, Blaze upgrade, or Cloud Storage lifecycle configuration is needed for this local-photo design. The app's existing Firebase Authentication and Firestore cloud sync remain unchanged.
+
+OCR uses browser-side Tesseract.js (English-first) to suggest shop/description, date and total. OCR is only a suggestion: users must review and confirm before a transaction is added. JPG, PNG and WebP images up to 10 MB are accepted.
+
+### Data-size note
+
+The app still syncs the complete LIFE-BUDDY state as one Firestore document, with a 1 MiB document limit. Photos are excluded from that document, but transaction metadata and OCR summaries still count toward the limit. A later scaling update should move transaction history into per-user subcollections.
