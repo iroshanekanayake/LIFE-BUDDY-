@@ -51,3 +51,14 @@ Open the HTTPS GitHub Pages URL and refresh once. The service-worker cache versi
 - `firebase.json` — Firebase CLI rules deployment configuration.
 - `service-worker.js`, `manifest.json`, `icon-192.png`, `icon-512.png` — PWA support.
 - `LIFE-BUDDY-original.html` — untouched copy of the supplied source HTML.
+
+
+## v5 Login and Settings improvements
+
+- Firebase Auth persistence is explicitly set to LOCAL so PWA sign-in survives app restarts.
+- A startup loading screen waits for Firebase auth state before showing the login gate, preventing a login-screen flash for signed-in users.
+- Account email, cloud sync status, and a confirmation-protected Sign out action are shown inside Settings.
+- Login form typography and button sizing are more compact.
+- Service-worker cache version is bumped so installed PWAs can receive the updated app shell.
+
+After uploading the updated files, refresh the installed PWA once while online. Existing Firebase users and Firestore data are retained.
