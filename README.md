@@ -78,3 +78,7 @@ OCR uses browser-side Tesseract.js (English-first) to suggest shop/description, 
 ### Data-size note
 
 The app still syncs the complete LIFE-BUDDY state as one Firestore document, with a 1 MiB document limit. Photos are excluded from that document, but transaction metadata and OCR summaries still count toward the limit. A later scaling update should move transaction history into per-user subcollections.
+
+
+## Home screen default period update
+The Home screen now opens with the current month selected instead of Today, so the initial balance, income, expense, and transaction list show the current month's totals. The Today, Week, and History filters remain available. No transaction data, Firestore structure, local storage keys, or calculation formulas were changed.

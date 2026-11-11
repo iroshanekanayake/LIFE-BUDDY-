@@ -380,7 +380,7 @@ function fix(){S.debts=S.debts||[];S.bills=S.bills||[];S.loans=S.loans||[];S.goa
 fix();
 function save(){try{localStorage.setItem(K,JSON.stringify(S));localStorage.setItem("life-buddy-login-language",S.lang)}catch(e){mem=S}}
 var $=function(i){return document.getElementById(i)};
-var P="today",ft="e",fc=null,eid=null,ct="e";
+var P="month",ft="e",fc=null,eid=null,ct="e";
 function t(k){return T[S.lang][k]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function iso(d){return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
